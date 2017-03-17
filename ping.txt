@@ -1,4 +1,5 @@
 bas ya loly
+bas ya 7aywan
 Command prompt
 
 ping 104.160.131.3 -t
