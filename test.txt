@@ -1,5 +1,0 @@
-<<<<<<< HEAD
-test rashad
-=======
-test loly
->>>>>>> origin/master
