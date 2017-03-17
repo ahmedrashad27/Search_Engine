@@ -1,3 +1,4 @@
+bas ya loly
 Command prompt
 
 ping 104.160.131.3 -t
