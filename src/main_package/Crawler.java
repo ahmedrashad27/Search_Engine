@@ -20,12 +20,12 @@ public class Crawler {
 	public static void crawl (String url) throws IOException
 	{
 		Document doc = null;
-		doc = Jsoup.connect("https://wikipedia.org").get();
+		doc = Jsoup.connect(url).get();
 		Elements links = doc.select("a[href]");
 		pages_visited += links.size();
 		System.out.println(pages_visited);
 		for (int i = 0; i < links.size(); i++) {
-			System.out.println(links.get(i).attr("abs:href"));
+		//	System.out.println(links.get(i).attr("abs:href"));
 		}
 		
 		
