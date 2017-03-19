@@ -24,6 +24,7 @@ public class Crawler {
 	
 	public Crawler() {
 		db = new DB();
+		
 		Page_List = new String[100] ; 
 		
 	}
@@ -83,7 +84,7 @@ public class Crawler {
 		
 		//if(db.runSql2(sql)==false)
 			//System.out.println("success");
-		
+	
 		String newstring = doc.html();
 		String sql = "INSERT INTO `pages`(`text`, `link`, `count`) VALUES ('" + "no_text_here" + "','"+ url +"',"+pages_visited+")";
 		

@@ -14,6 +14,13 @@ public class Main {
 	//public static DB db = new DB();
 	public static void main(String[] args) throws IOException, SQLException {
 		// TODO Auto-generated method stub
+	
+		
+		Indexer indexer = new Indexer();
+		
+		
+	/*	
+		
 		BufferedReader br = new BufferedReader(new FileReader("state.txt"));
 		
 	    StringBuilder sb = new StringBuilder();
@@ -31,11 +38,12 @@ public class Main {
 	    for (int i = 0; i < arr.length ; i++) {
 	    	arr[i] = br.readLine();
 		}
+	    br.close();
 		Crawler crawl = new Crawler(Integer.parseInt(line),Integer.parseInt(line2),arr);
 			crawl.crawl(arr[Integer.parseInt(line)]);
 	}
 			
-		
+*/		
 	}
 
 }
