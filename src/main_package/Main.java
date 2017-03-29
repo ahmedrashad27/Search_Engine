@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class Main {
 
@@ -16,10 +17,10 @@ public class Main {
 		// TODO Auto-generated method stub
 	
 		
-		Indexer indexer = new Indexer();
+		//Indexer indexer = new Indexer();
 		
 		
-	/*	
+	
 		
 		BufferedReader br = new BufferedReader(new FileReader("state.txt"));
 		
@@ -27,8 +28,14 @@ public class Main {
 	    String line = br.readLine();	
 	    
 	if(line == null){
+		
+		System.out.println("Enter number of threads");
+		Scanner scanner= new Scanner (System.in);
+		int nThreads = scanner.nextInt();
+		
 		Crawler crawl = new Crawler();
-		crawl.crawl("http://jamesclear.com/articles");
+		
+		crawl.crawl("https://www.google.com/search");
 	}
 	else
 	{
@@ -43,7 +50,7 @@ public class Main {
 			crawl.crawl(arr[Integer.parseInt(line)]);
 	}
 			
-*/		
+	
 	}
 
 }

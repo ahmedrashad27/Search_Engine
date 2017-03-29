@@ -31,7 +31,7 @@ public class Indexer {
 		for(int i =1; i<101 ; i++){
 			int counter = 0;		
 			
-			File file = new File("A:/CUFE/Senior-1/Advanced Programming Techniques/PAGES/"+ i+".txt");
+			File file = new File("C:/Users/Hassan/Desktop/College/APT/PAGES/"+ i+".txt");
 			 
 		    
 		    Document doc = Jsoup.parse(file, "UTF-8");
@@ -42,7 +42,7 @@ public class Indexer {
 		    Elements headings = doc.select("h1, h2, h3, h4, h5, h6");
 		    
 		    //remove title and headings from text
-		    for (Element element : doc.select("title,h1, h2, h3, h4, h5, h6,img"))
+		    for (Element element : doc.select("title,h1, h2, h3, h4, h5, h6,img,noscript"))
 		    {
 		    	element.remove();
 	
