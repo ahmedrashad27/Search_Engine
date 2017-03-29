@@ -8,34 +8,23 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Main {
-
-	
-			
-
 	//public static DB db = new DB();
 	public static void main(String[] args) throws IOException, SQLException {
 		// TODO Auto-generated method stub
-	
-		
 		//Indexer indexer = new Indexer();
-		
-		
-	
-		
 		BufferedReader br = new BufferedReader(new FileReader("state.txt"));
-		
 	    StringBuilder sb = new StringBuilder();
 	    String line = br.readLine();	
 	    
-	if(line == null){
-		
+	if(line == null || line.contains("0"))
+	{
 		System.out.println("Enter number of threads");
 		Scanner scanner= new Scanner (System.in);
 		int nThreads = scanner.nextInt();
 		
 		Crawler crawl = new Crawler();
 		
-		crawl.crawl("https://www.google.com/search");
+		crawl.crawl("http://www.bbc.com/news");
 	}
 	else
 	{
