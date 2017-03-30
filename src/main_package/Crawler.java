@@ -10,7 +10,11 @@ import java.net.URL;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.print.Doc;
 
 import com.panforge.robotstxt.RobotsTxt;
@@ -25,64 +29,133 @@ import org.jsoup.select.Elements;
 public class Crawler extends Thread{
 	
 	static String Page_List [] ;
-	static int pages_visited=0; 
+	static int pages_visited = 0; 
 	static int pages_to_visit = 0;
 	static DB db;
+	static Object lock = new Object();
 	
 	public Crawler() {
-		db = new DB();
-		Page_List = new String[100] ; 
-		
+		//db = new DB();
+		//Page_List = new String[100] ; 
 	}
 	
-	public Crawler(int pages_visited,int pages_to_visit,String [] Page_List) {
+	public Crawler(int pages_visited,int pages_to_visit,String [] Page_List) 
+	{
 		db = new DB();
-		Crawler.Page_List = Page_List;
-		Crawler.pages_visited = pages_visited;
-		Crawler.pages_to_visit = pages_to_visit;
+		synchronized (lock) 
+		{
+			Crawler.Page_List = Page_List;
+			Crawler.pages_visited = pages_visited;
+			Crawler.pages_to_visit = pages_to_visit;
+		}
 		
 	}
 	@Override
 	public void run() 
 	{
-		try {
-			crawl(Page_List[pages_visited]);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		while(true)
+		{
+			int x;
+			synchronized (lock)
+			{
+				x = pages_visited;
+				pages_visited++;
+			}
+
+			if(x<Page_List.length-1)// if there is a place to crawl
+			{	
+					
+				try {
+						if(db.runSql("SELECT * FROM pages  WHERE link='" + Page_List[x] +"'").next()==false)  //if page not already in db
+						{
+						Elements links = crawl(Page_List[x],x);
+						if (links != null)
+							{
+								InsertInPages_List(links);
+								Saving_State();
+							}
+						}
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					} catch (SQLException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+			}
+			else
+				break;
 		}
+		System.out.println(Thread.currentThread().getName()+" Finished" );
+		
 	}
 	
-	public static void crawl (String url) throws  SQLException, MalformedURLException, IOException
+	private void Saving_State() throws FileNotFoundException, UnsupportedEncodingException
 	{
-	
-		Document doc = null;
+		//SAVE CURRENT SATE
+		File file = new File("C:/Users/Hassan/Desktop/College/APT/GIT\\Search_Engine\\state.txt" );
 		
-		{//SAVE CURRENT SATE
-			File file = new File("C:/Users/Hassan/Desktop/College/APT/GIT\\Search_Engine\\state.txt" );
-			
-			PrintWriter writer = new PrintWriter("C:/Users/Hassan/Desktop/College/APT\\GIT\\Search_Engine\\state.txt", "UTF-8");
-		    writer.println(pages_visited);
-		    writer.println(pages_to_visit);
-		    
-		    for (int i = 0; i < pages_to_visit; i++) {
-		    	 writer.println(Page_List[i]);
-				    
-			}
-		    writer.close();
-		    
+		PrintWriter writer = new PrintWriter("C:/Users/Hassan/Desktop/College/APT\\GIT\\Search_Engine\\state.txt", "UTF-8");
+	    writer.println(pages_visited);
+	    writer.println(pages_to_visit);
+	    
+	    for (int i = 0; i < pages_to_visit; i++) {
+	    	 writer.println(Page_List[i]);
+			    
 		}
-		
-		
+	    writer.close();
+	}
+	private void InsertInPages_List(Elements links) throws SQLException 
+	{
+		for (int i = 0; i < links.size(); i++) 
+		{
+			if(pages_to_visit==Page_List.length) //stop inserting into array
+				break;
+			String check = "SELECT * FROM pages  WHERE link='" +links.get(i).attr("abs:href") +"'";
+			
+			//System.out.println(check);
+			if(db.runSql(check).next()==false) //if page not already in db
+			{
+			synchronized(lock)
+			{
+				Page_List[pages_to_visit] = links.get(i).attr("abs:href");
+				pages_to_visit++;
+			}	
+			}
+			else /// increment frequency of each page
+			{
+				String increment = "update pages set freq=freq+1 where link ='" + links.get(i).attr("abs:href") +"'";
+				db.runSql2(increment);
+			}
+		}
+		synchronized (lock)
+		{
+			int temp;
+			List<String> al = new ArrayList<String>();
+			al = new ArrayList(Arrays.asList(Page_List));
+			temp = al.size();
+	        Set<String> set = new HashSet<String>(al);
+			al.clear();
+	    	al = new ArrayList<String>(set);
+			temp = temp - al.size();
+			Page_List =  al.toArray(new String [al.size()]);
+			pages_to_visit = pages_to_visit - temp;
+		}
+	}
+
+	
+	public static Elements crawl (String url,int index) throws  SQLException, MalformedURLException, IOException
+	{
+
+		Document doc = null;
 		String nurl = url;
 		/// Robot exclusion
 		try {
 			URL u = new URL(url) ;
-			
-			
 			url=u.getProtocol().concat("://"+u.getHost()).concat("/robots.txt");
 			InputStream robotsTxtStream = null;
 			boolean f = false;
@@ -116,75 +189,37 @@ public class Crawler extends Thread{
 			}
 			
 		} catch (IOException e) { //error in connecting, crawl next page then return
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("SKIPPED!");
-			if(pages_visited<Page_List.length-1)
-			crawl(Page_List[++pages_visited]);
-			return;
+			Elements links = null; 
+			return links;
 		}
 		
-		Elements links = doc.select("a[href]");
-		
-		
-		if(pages_visited==0){ //initialize array by first array
-		Page_List[pages_visited] = url;
-		pages_to_visit++;
-		}
-		pages_visited += 1;
-		
-		System.out.println(pages_visited);
-		
-		
-		//if(db.runSql2(sql)==false)
-			//System.out.println("success");
-		
+		///*************************************************************************************************
+
 		java.util.Date dt = new java.util.Date();
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String currentTime = sdf.format(dt);
 		String newstring = doc.html();
 		// ******************take care second time will insert 0 in frequency**************************************
-		String sql = "INSERT INTO `pages`(`link`, `count`,`last_visited`,`freq`) VALUES ('"+ nurl +"',"+pages_visited+",'"+currentTime+"',0)";
+		String sql = "INSERT INTO `pages`(`link`, `count`,`last_visited`,`freq`) VALUES ('"+ nurl +"',"+index+",'"+currentTime+"',0)";
 		//write html of document to file
-		File file = new File("C:/Users/Hassan/Desktop/College/APT/PAGES/" +pages_visited + ".txt" );
+		File file = new File("C:/Users/Hassan/Desktop/College/APT/PAGES/" +index + ".txt" );
 		
-		PrintWriter writer = new PrintWriter("C:/Users/Hassan/Desktop/College/APT/PAGES/" + pages_visited + ".txt", "UTF-8");
+		PrintWriter writer = new PrintWriter("C:/Users/Hassan/Desktop/College/APT/PAGES/" + index + ".txt", "UTF-8");
 	    writer.println(newstring);
 	   
 	    writer.close();
 		
 		if(db.runSql2(sql)==false) //insert into db
 		{
-			System.out.println("Inserted # "+ pages_visited);
+			System.out.println(Thread.currentThread().getName()+" Inserted # "+ index);
 		}
-		for (int i = 0; i < links.size(); i++) 
-		{
-			if(pages_to_visit==Page_List.length) //stop inserting into array
-				break;
-			String check = "SELECT * FROM pages  WHERE link='" +links.get(i).attr("abs:href") +"'";
-
-			//System.out.println(check);
-			if(db.runSql(check).next()==false) //if page not already in db
-			{
-			Page_List[pages_to_visit] = links.get(i).attr("abs:href");
-			pages_to_visit++;
-			}
-			else /// increment frequency of each page
-			{
-				String increment = "update pages set freq=freq+1 where link ='" + links.get(i).attr("abs:href") +"'";
-				db.runSql2(increment);
-			}
-		}
-		if(pages_visited<Page_List.length-1)// if there is a place to crawl
-		{	
-			if(db.runSql("SELECT * FROM pages  WHERE link='" + Page_List[pages_visited] +"'").next()==false)  //if page not already in db
-				crawl(Page_List[pages_visited]);
-			else 
-			{
-				crawl(Page_List[pages_visited+1]); //crawl next page
-			}
-		}
-		System.out.println("finish" );
+		
+		///*************************************************************************************************
+		Elements links = doc.select("a[href]");
+		return links;
+		///*************************************************************************************************
 		
 	}
 	}
