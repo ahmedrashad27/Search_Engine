@@ -11,11 +11,9 @@ public class Main {
 	//public static DB db = new DB();
 	public static void main(String[] args) throws IOException, SQLException {
 		// TODO Auto-generated method stub
-		//Indexer indexer = new Indexer();
 		BufferedReader br = new BufferedReader(new FileReader("state.txt"));
 	    StringBuilder sb = new StringBuilder();
 	    String line = br.readLine();	
-	    
 
 		System.out.println("Enter number of threads");
 		Scanner scanner= new Scanner (System.in);
@@ -25,9 +23,13 @@ public class Main {
 	
 			if(line == null || line.contains("0"))
 			{
-				String[] FirstLink = new String[100];
+				String[] FirstLink = new String[1000];
 				FirstLink[0] = "http://www.bbc.com/news";
-				Crawler crawl = new Crawler(0,0,FirstLink);
+				FirstLink[1] = "https://en.wikipedia.org/wiki/Main_Page";
+				FirstLink[2] = "http://www.fifa.com/";
+				FirstLink[3] = "https://www.amazon.com/";
+				
+				Crawler crawl = new Crawler(0,4,FirstLink);
 				crawl.setName("First Thread");
 				crawl.start();
 			}
@@ -57,10 +59,12 @@ public class Main {
 				crawl.start();
 			}
 					
-		
-	    
-	
-	
+		/////Updating thread
+	    Update_Thread UT = new Update_Thread();
+	    UT.setName("Update_Thread");
+	    UT.start();
+	    /////// Indexer
+	    Indexer indexer = new Indexer();
 	}
 
 }

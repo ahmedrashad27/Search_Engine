@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+
 import javax.print.Doc;
 
 import org.jsoup.*;
@@ -11,6 +12,7 @@ import org.jsoup.helper.Validate;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 
 
 import java.io.BufferedReader;
@@ -28,34 +30,41 @@ public class Indexer {
 		db = new DB();
 		stemmer = new Stemmer();
 		
-		for(int i =1; i<101 ; i++){
-			int counter = 0;		
-			
-			File file = new File("C:/Users/Hassan/Desktop/College/APT/PAGES/"+ i+".txt");
-			 
-		    
-		    Document doc = Jsoup.parse(file, "UTF-8");
-	    	
-		    
-		   
-		    Elements titles = doc.select("title");
-		    Elements headings = doc.select("h1, h2, h3, h4, h5, h6");
-		    
-		    //remove title and headings from text
-		    for (Element element : doc.select("title,h1, h2, h3, h4, h5, h6,img,noscript"))
-		    {
-		    	element.remove();
-	
-		    }
-		    Elements text = doc.getAllElements();
-		    
-		  counter=  Process(titles,i,0,counter);
-		   counter= Process(headings,i,1,counter);
-		    counter =Process(text,i,2,counter);
-		    
-		    System.out.println("FINISHED #"+i);
-		    	    
-	}
+		while(true)
+		{
+			ResultSet pages = db.runSql("SELECT count FROM pages  WHERE `update` = 1");
+			while(pages.next())
+			{
+				
+				int counter = 0;		
+				int i = pages.getInt("count");
+				String delete_words = "DELETE FROM words WHERE file_no = "+ i ;
+				db.runSql2(delete_words);
+				String update = "update pages set `update` = 0 where count =" + i +"";
+				db.runSql2(update);
+				File file = new File("C:/Users/Hassan/Desktop/College/APT/PAGES/"+ i+".txt");
+			    
+			    Document doc = Jsoup.parse(file, "UTF-8");
+		    	
+			    Elements titles = doc.select("title");
+			    Elements headings = doc.select("h1, h2, h3, h4, h5, h6");
+			    
+			    //remove title and headings from text
+			    for (Element element : doc.select("title,h1, h2, h3, h4, h5, h6,img,noscript"))
+			    {
+			    	element.remove();
+		
+			    }
+			    Elements text = doc.getAllElements();
+			    
+			  counter=  Process(titles,i,0,counter);
+			   counter= Process(headings,i,1,counter);
+			    counter =Process(text,i,2,counter);
+			    
+			    System.out.println("FINISHED #"+i);
+			    	    
+			}
+		}
 	}
 	public static int Process(Elements e,int fileno,int importance,int counter) throws SQLException
 	{
@@ -102,8 +111,5 @@ public class Indexer {
 		   return counter;
 		  //  System.out.println(hTags.get(7).text()); //check if empty-
 
-		
-	
 	}
-	
 }

@@ -12,9 +12,13 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.print.Doc;
 
 import com.panforge.robotstxt.RobotsTxt;
@@ -26,15 +30,16 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 
-public class Crawler extends Thread{
-	
+public class Crawler extends Thread
+{
 	static String Page_List [] ;
 	static int pages_visited = 0; 
 	static int pages_to_visit = 0;
 	static DB db;
 	static Object lock = new Object();
 	
-	public Crawler() {
+	public Crawler() 
+	{
 		//db = new DB();
 		//Page_List = new String[100] ; 
 	}
@@ -111,6 +116,8 @@ public class Crawler extends Thread{
 	}
 	private void InsertInPages_List(Elements links) throws SQLException 
 	{
+		synchronized(lock)
+		{
 		for (int i = 0; i < links.size(); i++) 
 		{
 			if(pages_to_visit==Page_List.length) //stop inserting into array
@@ -120,11 +127,9 @@ public class Crawler extends Thread{
 			//System.out.println(check);
 			if(db.runSql(check).next()==false) //if page not already in db
 			{
-			synchronized(lock)
-			{
-				Page_List[pages_to_visit] = links.get(i).attr("abs:href");
+				Page_List[pages_to_visit] = links.get(i).attr("abs:href");	
+
 				pages_to_visit++;
-			}	
 			}
 			else /// increment frequency of each page
 			{
@@ -132,25 +137,22 @@ public class Crawler extends Thread{
 				db.runSql2(increment);
 			}
 		}
-		synchronized (lock)
-		{
-			int temp;
+			
 			List<String> al = new ArrayList<String>();
 			al = new ArrayList(Arrays.asList(Page_List));
-			temp = al.size();
-	        Set<String> set = new HashSet<String>(al);
+			al.removeAll(Collections.singleton(null));
+			int temp = al.size();
+	        Set<String> set = new LinkedHashSet<String>(al);
 			al.clear();
 	    	al = new ArrayList<String>(set);
 			temp = temp - al.size();
-			Page_List =  al.toArray(new String [al.size()]);
+			Page_List =  al.toArray(new String [1000]);
 			pages_to_visit = pages_to_visit - temp;
 		}
 	}
-
 	
 	public static Elements crawl (String url,int index) throws  SQLException, MalformedURLException, IOException
 	{
-
 		Document doc = null;
 		String nurl = url;
 		/// Robot exclusion
@@ -174,7 +176,7 @@ public class Crawler extends Thread{
 				ArobotsTxt = RobotsTxt.read(robotsTxtStream);
 				hasAccess = ArobotsTxt.query(null,nurl);
 				Integer x = ArobotsTxt.getCrawlDelay();
-				System.out.println(x);
+				//System.out.println(x);
 			}
 			if(hasAccess==true) // we can access
 			{
@@ -183,8 +185,6 @@ public class Crawler extends Thread{
 			else // we have no access
 			{
 				System.out.println("NO ACCESS");
-				
-				//IOException e = null;
 				throw new IOException();
 			}
 			
@@ -199,10 +199,12 @@ public class Crawler extends Thread{
 
 		java.util.Date dt = new java.util.Date();
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		dt.setDate(dt.getDate());
 		String currentTime = sdf.format(dt);
+		
 		String newstring = doc.html();
 		// ******************take care second time will insert 0 in frequency**************************************
-		String sql = "INSERT INTO `pages`(`link`, `count`,`last_visited`,`freq`) VALUES ('"+ nurl +"',"+index+",'"+currentTime+"',0)";
+		String sql = "INSERT INTO `pages`(`link`, `count`,`last_visited`,`freq`,`update`) VALUES ('"+ nurl +"',"+index+",'"+currentTime+"',0,1)";
 		//write html of document to file
 		File file = new File("C:/Users/Hassan/Desktop/College/APT/PAGES/" +index + ".txt" );
 		
