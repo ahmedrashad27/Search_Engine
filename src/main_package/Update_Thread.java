@@ -28,12 +28,16 @@ public class Update_Thread extends Thread
 	{
 		while(true)
 		{
+			///Getting time
 			java.util.Date dt = new java.util.Date();
 			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String real_currentTime = sdf.format(dt);
+			/// Setting time minus 1 week our chosen criteria
 			dt.setDate(dt.getDate()-7);
 			String currentTime = sdf.format(dt);
 			try {
+				///Getting all urls that were visited before 1 week and setting its
+				///update column by 1 to be updated in the indexer 
 					ResultSet urls = db.runSql("SELECT link,count FROM pages  WHERE last_visited <='" + currentTime +"'");
 					while(urls.next())
 					{
@@ -44,7 +48,9 @@ public class Update_Thread extends Thread
 						System.out.println("Updated file "+index+" For time");
 						crawl(url, index);
 					}
-					urls = db.runSql("SELECT link,count FROM pages  WHERE freq%50 = 15");
+					///Getting all urls that reachs frequency = 50 and setting its
+					///update column by 1 to be updated in the indexer 
+					urls = db.runSql("SELECT link,count FROM pages  WHERE freq%51 = 50");
 					while(urls.next())
 					{
 						String url = urls.getString("link");

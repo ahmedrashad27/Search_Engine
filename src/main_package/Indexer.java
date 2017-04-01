@@ -32,20 +32,24 @@ public class Indexer {
 		
 		while(true)
 		{
+			//// Getting all pages to be indexed
 			ResultSet pages = db.runSql("SELECT count FROM pages  WHERE `update` = 1");
 			while(pages.next())
 			{
 				
 				int counter = 0;		
 				int i = pages.getInt("count");
+				//// Remove old pages
 				String delete_words = "DELETE FROM words WHERE file_no = "+ i ;
 				db.runSql2(delete_words);
+				//// Set update to 0 it means page is indexed
 				String update = "update pages set `update` = 0 where count =" + i +"";
 				db.runSql2(update);
+				/// Getting the text file using the number of file
 				File file = new File("C:/Users/Hassan/Desktop/College/APT/PAGES/"+ i+".txt");
 			    
 			    Document doc = Jsoup.parse(file, "UTF-8");
-		    	
+		    	// select titles and headings
 			    Elements titles = doc.select("title");
 			    Elements headings = doc.select("h1, h2, h3, h4, h5, h6");
 			    
@@ -56,7 +60,7 @@ public class Indexer {
 		
 			    }
 			    Elements text = doc.getAllElements();
-			    
+			    /// Calling function process
 			  counter=  Process(titles,i,0,counter);
 			   counter= Process(headings,i,1,counter);
 			    counter =Process(text,i,2,counter);
@@ -109,7 +113,6 @@ public class Indexer {
 		    counter++;
 		   }	
 		   return counter;
-		  //  System.out.println(hTags.get(7).text()); //check if empty-
 
 	}
 }
