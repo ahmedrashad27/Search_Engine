@@ -64,7 +64,9 @@ public class Main {
 	    UT.setName("Update_Thread");
 	    UT.start();
 	    /////// Indexer
-	    Indexer indexer = new Indexer();
+	  //  Indexer indexer = new Indexer();
+	    Ranker ranker = new Ranker();
+	    ranker.Process("bbc");
 	}
 
 }

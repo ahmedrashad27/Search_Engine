@@ -108,9 +108,9 @@ public class Crawler extends Thread
 	    writer.println(pages_visited);
 	    writer.println(pages_to_visit);
 	    
-	    for (int i = 0; i < pages_to_visit; i++) {
+	    for (int i = 0; i < pages_to_visit; i++) 
+	    {
 	    	 writer.println(Page_List[i]);
-			    
 		}
 	    writer.close();
 	}
@@ -165,7 +165,6 @@ public class Crawler extends Thread
 			try{robotsTxtStream = new URL(url).openStream();}
 			catch(FileNotFoundException e) /// handling if file robot not found
 			{
-				e.printStackTrace();
 				System.out.println("Robot not found");
 				f = true;
 				hasAccess = true;
@@ -189,7 +188,6 @@ public class Crawler extends Thread
 			}
 			
 		} catch (IOException e) { //error in connecting, crawl next page then return
-			e.printStackTrace();
 			System.out.println("SKIPPED!");
 			Elements links = null; 
 			return links;
