@@ -33,10 +33,10 @@ public class Indexer {
 		while(true)
 		{
 			//// Getting all pages to be indexed
-			ResultSet pages = db.runSql("SELECT count FROM pages  WHERE `update` = 1");
+			ResultSet pages = db.runSql("SELECT count FROM pages  WHERE `update` = 1 AND `count` > 140");
+			
 			while(pages.next())
 			{
-				
 				int counter = 0;		
 				int i = pages.getInt("count");
 				//// Remove old pages
@@ -74,6 +74,8 @@ public class Indexer {
 	{
 		 ArrayList<String> words = new ArrayList<String>();
 
+		 if(e.isEmpty())
+		 {return counter;}
 		   String[] tempwords = e.get(0).text().split("[^A-Z0-9a-z]+");
 		   
 		   //change to lower case

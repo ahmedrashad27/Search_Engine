@@ -7,10 +7,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import com.mysql.jdbc.authentication.MysqlClearPasswordPlugin;
+
 public class Main {
 	//public static DB db = new DB();
 	public static void main(String[] args) throws IOException, SQLException {
 		// TODO Auto-generated method stub
+		
+		//Interface I = new Interface();
+		//System.out.println(I.getServletInfo());
+		
+		
 		BufferedReader br = new BufferedReader(new FileReader("state.txt"));
 	    StringBuilder sb = new StringBuilder();
 	    String line = br.readLine();	
@@ -64,9 +71,9 @@ public class Main {
 	    UT.setName("Update_Thread");
 	    UT.start();
 	    /////// Indexer
-	  //  Indexer indexer = new Indexer();
-	    Ranker ranker = new Ranker();
-	    ranker.Process("bbc");
+	   Indexer indexer = new Indexer();
+	    //Ranker ranker = new Ranker();
+	    //ranker.Process("bbc sports");
 	}
 
 }

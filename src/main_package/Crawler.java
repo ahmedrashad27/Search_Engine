@@ -99,17 +99,25 @@ public class Crawler extends Thread
 		
 	}
 	
-	private void Saving_State() throws FileNotFoundException, UnsupportedEncodingException
+	private void Saving_State() throws FileNotFoundException, UnsupportedEncodingException, SQLException
 	{
 		//SAVE CURRENT SATE
 		File file = new File("C:/Users/Hassan/Desktop/College/APT/GIT\\Search_Engine\\state.txt" );
-		
 		PrintWriter writer = new PrintWriter("C:/Users/Hassan/Desktop/College/APT\\GIT\\Search_Engine\\state.txt", "UTF-8");
 	    writer.println(pages_visited);
 	    writer.println(pages_to_visit);
-	    
-	    for (int i = 0; i < pages_to_visit; i++) 
+	    /*
+	    String up = "update state_nums set pages_visited=" + pages_visited + ",pages_to_visit = " + pages_to_visit ;
+		db.runSql2(up);
+		String Drop = "ALTER TABLE state DROP urls";
+    	db.runSql2(Drop);
+    	String Add = "ALTER TABLE state ADD urls INT";
+    	db.runSql2(Add);
+	    */
+    	for (int i = 0; i < pages_to_visit; i++) 
 	    {
+	    	//String sql = "INSERT INTO `state`(`urls`) VALUES ('"+ Page_List[i] +")";
+	    	//db.runSql2(sql);
 	    	 writer.println(Page_List[i]);
 		}
 	    writer.close();
