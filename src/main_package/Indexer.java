@@ -25,7 +25,7 @@ import java.net.MalformedURLException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Indexer extends Thread{
+public class Indexer extends Thread{	
 	static DB db;
 	static Object lock = new Object();
 	
@@ -46,7 +46,7 @@ public class Indexer extends Thread{
 			synchronized (lock) {
 				
 			
-			ResultSet pages = db.runSql("SELECT count FROM pages  WHERE `update` = 1");
+			ResultSet pages = db.runSql("SELECT count FROM pages  WHERE `update` = 1 AND `count` > 499");
 			
 			pages.next();
 				counter = 0;		

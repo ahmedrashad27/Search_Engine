@@ -108,7 +108,7 @@ public class Ranker {
 		 ArrayList<Integer> keys = new ArrayList<Integer>(TF_IDF.keySet());
 	        for(int i=keys.size()-1; i>=0;i--)
 	        {
-	           // System.out.println(keys.get(i)+":" + TF_IDF.get(keys.get(i)));
+	            System.out.println(keys.get(i)+":" + TF_IDF.get(keys.get(i)));
 	        }
 	        return TF_IDF;
 	}
@@ -137,7 +137,7 @@ public class Ranker {
 		 ArrayList<Integer> keys = new ArrayList<Integer>(Ranks.keySet());
 	        for(int i=keys.size()-1; i>=0;i--)
 	        {
-	            //System.out.println(keys.get(i)+":" + Ranks.get(keys.get(i)));
+	            System.out.println(keys.get(i)+":" + Ranks.get(keys.get(i)));
 	        }
 	        return Ranks;
 	}

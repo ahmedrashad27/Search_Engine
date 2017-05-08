@@ -92,15 +92,15 @@ public class Main {
 	   Indexer indexer1 = new Indexer();
 	   indexer1.start();
 	   Indexer indexer2= new Indexer();
-	   Indexer indexer3 = new Indexer();
-	   Indexer indexer4 = new Indexer();
+	  // Indexer indexer3 = new Indexer();
+	//   Indexer indexer4 = new Indexer();
 	
-	   indexer2.start();
-	   indexer3.start();
-	   indexer4.start();
+	  indexer2.start();
+	 //  indexer3.start();
+	  // indexer4.start();
 	  
 	    //Ranker ranker = new Ranker();
-	    //ranker.Process("bbc sports");
+	    //ranker.Process("\"Birds survived dino\"",db);
 	}
 
 }

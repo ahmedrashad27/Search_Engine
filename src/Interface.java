@@ -61,8 +61,7 @@ public class Interface extends HttpServlet{
 			+ " <input type='text' name='query' class='form-control' style='width:35% '; value='"+request.getParameter("query")+ "'> <br> <br> <br>"
 			 + "<input type='submit' value='Google Search'name='search' class='btn';' ><br> "
 			 + "</form>	"		  + "<div align = 'left' style= 'padding-left : 10% ;line-height:20px;'>"
-
-;
+			 ;
 			  for (Entry<Integer, Float> entry : rank.entrySet())
 			  {
 					File file = new File("C:/Users/Hassan/Desktop/College/APT/PAGES/"+ entry.getKey()+".txt");
@@ -74,9 +73,51 @@ public class Interface extends HttpServlet{
 				  //  Elements headings = doc.select("h1, h2, h3, h4, h5, h6");
 				    
 				    String heading ="";
+				    int z =0;
+				    if(request.getParameter("query").startsWith("\"") && request.getParameter("query").endsWith("\""))
+				    		{
+				    			if(z<2)
+							    {
+								    for (Element element : doc.select("title,h1, h2, h3, h4, h5, h6,img,noscript"))
+								    {
+								    	element.remove();
+							
+								    }
+								    String text = doc.text().toLowerCase();
+								    String[] tempo = text.split("[\\.|\\?]");
+								    int p=0;
+								    String query = request.getParameter("query").substring(1,request.getParameter("query").length()-2);
+								    while(z<2)
+								    {	
+									    for (int i = 0; i < tempo.length; i++) 
+									    {
+										    if(tempo[i].contains(query) && z<2)
+										    {	
+										    	
+										    	if(tempo[i].length() > 280 )
+										    	{
+										    		tempo[i] = tempo[i].substring(0,179);
+										    		tempo[i] += "...";
+										    	}
+										    	System.out.println("text: " +p+"   " + tempo[i]);
+												captionString += tempo[i];
+												z++;
+												if(z==2)
+												break;    	
+								
+											}
+									    }
+									    break;
+								    }
+								    
+							    }
+							
+				    		}
+				    		else
+				    		{
 				    String[] temp = request.getParameter("query").split(" ");
 				    //int [] indexes ={0,0} ;
-				    int z =0;
+				    
 				   /* for (int i = 0; i < headings.size(); i++) {
 					    if(headings.get(i).text().contains(temp[0]) && z<2)
 					    {
@@ -94,7 +135,7 @@ public class Interface extends HttpServlet{
 					    	element.remove();
 				
 					    }
-					    String text = doc.text();
+					    String text = doc.text().toLowerCase();
 					    String[] tempo = text.split("[\\.|\\?]");
 					    int p=0;
 					    while(z<2)
@@ -122,6 +163,7 @@ public class Interface extends HttpServlet{
 					    }
 					    
 				    }
+				    		}
 				  newtitle = titles.text();
 				  ResultSet s = null;
 				  ResultSet nos= null;
