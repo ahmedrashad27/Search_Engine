@@ -15,6 +15,8 @@ public class DB {
 			String url = "jdbc:mysql://localhost:3306/Crawler";
 			conn = DriverManager.getConnection(url, "root", "");
 			System.out.println("conn built");
+			if(conn.isClosed())
+				System.out.println("not connected");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {

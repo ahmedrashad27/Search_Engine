@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -66,10 +67,8 @@ public class Crawler extends Thread
 				x = pages_visited;
 				pages_visited++;
 			}
-
 			if(x<Page_List.length-1)// if there is a place to crawl
 			{	
-					
 				try {
 						if(db.runSql("SELECT * FROM pages  WHERE link='" + Page_List[x] +"'").next()==false)  //if page not already in db
 						{
@@ -95,32 +94,40 @@ public class Crawler extends Thread
 			else
 				break;
 		}
-		System.out.println(Thread.currentThread().getName()+" Finished" );
-		
+		System.out.println(Thread.currentThread().getName()+" Finished" );	
 	}
-	
 	private void Saving_State() throws FileNotFoundException, UnsupportedEncodingException, SQLException
 	{
 		//SAVE CURRENT SATE
-		File file = new File("C:/Users/Hassan/Desktop/College/APT/GIT\\Search_Engine\\state.txt" );
+		/*File file = new File("C:/Users/Hassan/Desktop/College/APT/GIT\\Search_Engine\\state.txt" );
 		PrintWriter writer = new PrintWriter("C:/Users/Hassan/Desktop/College/APT\\GIT\\Search_Engine\\state.txt", "UTF-8");
 	    writer.println(pages_visited);
 	    writer.println(pages_to_visit);
-	    /*
-	    String up = "update state_nums set pages_visited=" + pages_visited + ",pages_to_visit = " + pages_to_visit ;
-		db.runSql2(up);
-		String Drop = "ALTER TABLE state DROP urls";
-    	db.runSql2(Drop);
-    	String Add = "ALTER TABLE state ADD urls INT";
-    	db.runSql2(Add);
 	    */
-    	for (int i = 0; i < pages_to_visit; i++) 
+		synchronized (lock) 
+		{
+	    String up = "update `state_nums` set `pages_visited` =" + pages_visited + ", `pages_to_visit` = " + pages_to_visit ;
+		db.runSql2(up);
+		
+		//String Drop = "ALTER TABLE `state` DROP COLUMN `urls`";
+		///String Drop = "DROP TABLE `state`";
+		///db.runSql2(Drop);
+		
+    	//String Add = "ALTER TABLE `state` ADD `urls` VARCHAR(1000)";
+    	//String Add = "CREATE TABLE `state` (`urls` VARCHAR(1000))";
+    	//db.runSql2(Add);
+	    String count = "Select count(*) as count from `state`";
+	    ResultSet c = db.runSql(count);
+	    c.next();
+	    int co = c.getInt("count");
+    	for (int i = co; i < pages_to_visit; i++) 
 	    {
-	    	//String sql = "INSERT INTO `state`(`urls`) VALUES ('"+ Page_List[i] +")";
-	    	//db.runSql2(sql);
-	    	 writer.println(Page_List[i]);
+	    	String sql = "INSERT INTO `state`(`urls`) VALUES ('"+ Page_List[i] +"')";
+	    	db.runSql2(sql);
+	    	 //writer.println(Page_List[i]);
 		}
-	    writer.close();
+		}
+	   // writer.close();
 	}
 	private void InsertInPages_List(Elements links) throws SQLException 
 	{
@@ -136,7 +143,6 @@ public class Crawler extends Thread
 			if(db.runSql(check).next()==false) //if page not already in db
 			{
 				Page_List[pages_to_visit] = links.get(i).attr("abs:href");	
-
 				pages_to_visit++;
 			}
 			else /// increment frequency of each page
